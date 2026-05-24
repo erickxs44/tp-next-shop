@@ -63,6 +63,8 @@
     linear-gradient(180deg, oklch(0.09 0 0), oklch(0.06 0 0));
   --mesh-size: 10px 10px, 10px 10px, 100% 100%;
   --glow-red: 0 0 24px oklch(0.58 0.24 27 / 0.55), 0 0 60px oklch(0.58 0.24 27 / 0.25);
+  --glow-red-soft: 0 0 12px oklch(0.58 0.24 27 / 0.35);
+  --glow-red-strong: 0 0 30px oklch(0.58 0.24 27 / 0.8), 0 0 80px oklch(0.58 0.24 27 / 0.35);
 }
 
 @layer base {
@@ -79,23 +81,21 @@
   .bg-mesh {
     background-image: var(--mesh-bg);
     background-size: var(--mesh-size);
+    position: relative;
+  }
+  .bg-mesh-pulse::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 30%, oklch(0.58 0.24 27 / 0.10), transparent 60%);
+    animation: mesh-pulse 6s ease-in-out infinite;
   }
   .red-glow { box-shadow: var(--glow-red); }
   .text-brand { color: var(--color-brand); }
   .bg-brand { background-color: var(--color-brand); }
   .border-brand { border-color: var(--color-brand); }
-  .geo-frame {
-    position: relative;
-  }
-  .geo-frame::before {
-    content: "";
-    position: absolute;
-    inset: 8px;
-    border: 2px solid var(--color-brand);
-    transform: rotate(45deg);
-    pointer-events: none;
-    opacity: 0.9;
-  }
+
   .geo-frame-rect {
     position: relative;
     padding: 12px;
@@ -111,7 +111,9 @@
       12px 100%, 0 calc(100% - 12px)
     );
     pointer-events: none;
+    animation: border-pulse 3s ease-in-out infinite;
   }
+
   .btn-brand {
     display: inline-flex;
     align-items: center;
@@ -129,6 +131,9 @@
     clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   }
   .btn-brand:hover { filter: brightness(1.1); box-shadow: var(--glow-red); }
+  .btn-brand:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+  .btn-brand:disabled:hover { box-shadow: none; filter: grayscale(0.5); }
+
   .btn-outline-brand {
     display: inline-flex;
     align-items: center;
@@ -145,4 +150,71 @@
     transition: all 0.2s ease;
   }
   .btn-outline-brand:hover { background: var(--color-brand); color: var(--color-brand-foreground); }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cart bump */
+  .cart-bump { animation: cart-bump 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+
+  /* Stagger fade-up */
+  .stagger-item {
+    opacity: 0;
+    animation: stagger-up 0.55s ease-out forwards;
+  }
+
+  /* Particles container */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .particles span {
+    position: absolute;
+    bottom: -8px;
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: var(--color-brand);
+    box-shadow: 0 0 8px var(--color-brand), 0 0 14px oklch(0.58 0.24 27 / 0.7);
+    opacity: 0;
+    animation: float-up linear infinite;
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% { filter: drop-shadow(0 0 2px oklch(0.58 0.24 27 / 0.5)); }
+  50% { filter: drop-shadow(0 0 10px oklch(0.58 0.24 27 / 0.9)); }
+}
+@keyframes mesh-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes cart-bump {
+  0% { transform: scale(1) rotate(0); }
+  20% { transform: scale(1.2) rotate(-12deg); }
+  40% { transform: scale(0.95) rotate(10deg); }
+  60% { transform: scale(1.1) rotate(-6deg); }
+  80% { transform: scale(0.98) rotate(3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes stagger-up {
+  0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes float-up {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
 }

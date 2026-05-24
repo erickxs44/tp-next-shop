@@ -5,7 +5,6 @@ import { SideMenu } from "@/components/SideMenu";
 import { Hero } from "@/components/Hero";
 import { TrustBar } from "@/components/TrustBar";
 import { Categories } from "@/components/Categories";
-import { ProductGrid } from "@/components/ProductGrid";
 import { MarketingBlocks } from "@/components/MarketingBlocks";
 import { InstagramGallery } from "@/components/InstagramGallery";
 import { Footer } from "@/components/Footer";
@@ -15,9 +14,9 @@ import { CartDrawer } from "@/components/CartDrawer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TP Multimarcas — Surf & Griffe Premium" },
-      { name: "description", content: "Tênis, camisas, jaquetas e acessórios premium. Curadoria streetwear e griffes selecionadas. Finalize via WhatsApp." },
-      { property: "og:title", content: "TP Multimarcas — Surf & Griffe Premium" },
+      { title: "TP Store — Streetwear de luxo & Multimarcas" },
+      { name: "description", content: "Tênis, camisas, jaquetas e acessórios premium. Curadoria streetwear de luxo. Finalize via WhatsApp." },
+      { property: "og:title", content: "TP Store — Streetwear de luxo" },
       { property: "og:description", content: "A nova experiência premium da TP. Tênis, streetwear e griffes selecionadas." },
     ],
   }),
@@ -33,7 +32,6 @@ function Index() {
           <Hero />
           <TrustBar />
           <Categories />
-          <ProductGrid />
           <MarketingBlocks />
           <InstagramGallery />
         </main>
