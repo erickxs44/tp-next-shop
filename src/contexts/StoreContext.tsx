@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
 import type { Category, Product } from "@/lib/products";
 
 export interface CartItem {
@@ -11,7 +11,7 @@ export interface CartItem {
 
 interface StoreCtx {
   cart: CartItem[];
-  addToCart: (p: Product, size: string, color: string) => void;
+  addToCart: (p: Product, size: string, color: string, qty?: number) => void;
   removeFromCart: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   clearCart: () => void;
@@ -25,6 +25,7 @@ interface StoreCtx {
   setQuickView: (p: Product | null) => void;
   activeCategory: Category | "Todos";
   setActiveCategory: (c: Category | "Todos") => void;
+  bump: number;
 }
 
 const Ctx = createContext<StoreCtx | null>(null);
@@ -35,16 +36,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [quickView, setQuickView] = useState<Product | null>(null);
   const [activeCategory, setActiveCategory] = useState<Category | "Todos">("Todos");
+  const [bump, setBump] = useState(0);
 
-  const addToCart = useCallback((p: Product, size: string, color: string) => {
+  const addToCart = useCallback((p: Product, size: string, color: string, qty: number = 1) => {
     setCart((prev) => {
       const key = `${p.id}-${size}-${color}`;
       const existing = prev.find((i) => i.id === key);
       if (existing) {
-        return prev.map((i) => (i.id === key ? { ...i, qty: i.qty + 1 } : i));
+        return prev.map((i) => (i.id === key ? { ...i, qty: i.qty + qty } : i));
       }
-      return [...prev, { id: key, product: p, size, color, qty: 1 }];
+      return [...prev, { id: key, product: p, size, color, qty }];
     });
+    setBump((b) => b + 1);
   }, []);
 
   const removeFromCart = useCallback((id: string) => {
@@ -59,6 +62,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setCart([]), []);
 
+  // Lock body scroll when modals open
+  useEffect(() => {
+    const open = cartOpen || menuOpen || !!quickView;
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [cartOpen, menuOpen, quickView]);
+
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartTotal = cart.reduce((s, i) => s + i.qty * i.product.price, 0);
 
@@ -71,6 +81,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         menuOpen, setMenuOpen,
         quickView, setQuickView,
         activeCategory, setActiveCategory,
+        bump,
       }}
     >
       {children}
